@@ -1,24 +1,33 @@
 from apscheduler.schedulers.background import BackgroundScheduler
+from tasks import ActualizarPrecios, EnviarCorreosRecordatorio, GenerarInformeVentas
 from config import SCHEDULER_CONFIG
-from tasks import actualizar_precios, enviar_correos_recordatorio, generar_informe_ventas
 
-def iniciar_scheduler():
-    scheduler = BackgroundScheduler()
+class SchedulerManager:
+    def __init__(self):
+        self.scheduler = BackgroundScheduler(**SCHEDULER_CONFIG)
     
-    scheduler.add_job(actualizar_precios, 'interval', hours=6, id='actualizar_precios')
-    scheduler.add_job(enviar_correos_recordatorio, 'interval', days=1, id='enviar_correos_recordatorio', hour=9)
-    scheduler.add_job(generar_informe_ventas, 'cron', day_of_week='mon-fri', hour=18, id='generar_informe_ventas')
-
-    scheduler.start()
-    print("Scheduler iniciado")
+    def configurar_tareas(self):
+        self.scheduler.add_job(ActualizarPrecios().ejecutar, 'interval', hours=6, id='actualizar_precios')
+        self.scheduler.add_job(EnviarCorreosRecordatorio().ejecutar, 'interval', days=1, id='enviar_correos_recordatorio', hour=9)
+        self.scheduler.add_job(GenerarInformeVentas().ejecutar, 'cron', day_of_week='mon-fri', hour=18, id='generar_informe_ventas')
+    
+    def iniciar_scheduler(self):
+        self.scheduler.start()
+        print("Scheduler iniciado")
+    
+    def detener_scheduler(self):
+        self.scheduler.shutdown()
+        print("Scheduler detenido")
 
 if __name__ == "__main__":
-    iniciar_scheduler()
+    manager = SchedulerManager()
+    manager.configurar_tareas()
 
     try:
         # Mantener el script en ejecución
         while True:
             pass
     except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+        manager.detener_scheduler()
         print("Scheduler detenido")
+
