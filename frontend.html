@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Control de Scheduler</h1>
+        <div>
+            <button class="btn" id="startScheduler">Iniciar Scheduler</button>
+            <button class="btn" id="stopScheduler">Detener Scheduler</button>
+        </div>
+        <hr>
+        <h2>Tareas Programadas</h2>
+        <button class="btn" id="runTask">Ejecutar Tarea Manualmente</button>
+        <div id="taskStatus" class="status"></div>
+    </div>
+
+    <script>
+        function updateStatus(message) {
+            document.getElementById('taskStatus').innerText = message;
+        }
+
+        async function startScheduler() {
+            const response = await fetch('/start_scheduler', { method: 'POST' });
+            const result = await response.json();
+            updateStatus(result.message);
+        }
+
+        async function stopScheduler() {
+            const response = await fetch('/stop_scheduler', { method: 'POST' });
+            const result = await response.json();
+            updateStatus(result.message);
+        }
+
+        async function runTask() {
+            const response = await fetch('/run_task', { method: 'POST' });
+            const result = await response.json();
+            updateStatus(result.message);
+        }
+
+        document.getElementById('startScheduler').addEventListener('click', startScheduler);
+        document.getElementById('stopScheduler').addEventListener('click', stopScheduler);
+        document.getElementById('runTask').addEventListener('click', runTask);
+    </script>
+</body>
+</html>
